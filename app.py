@@ -9,7 +9,7 @@ from ollama import Client
 from newspaper import Article
 
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, Collapsible
+from textual.widgets import Header, Footer, Collapsible, Static
 
 hn_base = "https://hacker-news.firebaseio.com/v0"
 ollama_url = "http://localhost:11434"
@@ -95,6 +95,16 @@ class HNApp(App):
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
         yield Header()
+
+        for i, (article, summary) in enumerate(zip(articles, summaries)):
+            title = article[1]
+            author = article[2]
+
+            yield Collapsible(
+                Static(summary),
+                title=f"{i + 1}. {title} (by {author})",
+            )
+
         yield Footer()
 
     def action_toggle_dark(self) -> None:
@@ -107,7 +117,9 @@ class HNApp(App):
 
 if __name__ == "__main__":
     nltk.download("punkt_tab")
-    n = 3
+    n = 5
     articles = get_best_articles(n)
     summaries = get_summaries(articles)
-    print(summaries)
+
+    app = HNApp()
+    app.run()
